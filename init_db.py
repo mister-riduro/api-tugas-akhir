@@ -1,17 +1,22 @@
 import os
 import psycopg2
-
+import os
 from dotenv import load_dotenv
+
+load_dotenv()
+
+print(os.getenv('DB_USERNAME'))
 
 conn = psycopg2.connect(
         host="localhost",
-        database="flask_db",
-        user=load_dotenv('DB_USERNAME'),
-        password=load_dotenv('DB_PASSWORD'))
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USERNAME'),
+        password=os.getenv('DB_PASSWORD'))
 
 cur = conn.cursor()
 
 # User
+cur.execute(""" DROP TABLE IF EXISTS users; """)
 cur.execute("""
     CREATE TABLE users (user_id serial PRIMARY KEY,
                         name varchar (150) NOT NULL,
@@ -24,6 +29,7 @@ cur.execute("""
             """)
 
 # Hotel
+cur.execute(""" DROP TABLE IF EXISTS hotels; """)
 cur.execute("""
     CREATE TABLE hotels (hotel_id serial PRIMARY KEY,
                         hotel_image text NOT NULL,
@@ -41,6 +47,7 @@ cur.execute("""
             """)
 
 # Provinsi
+cur.execute(""" DROP TABLE IF EXISTS provinces; """)
 cur.execute("""
     CREATE TABLE provinces (province_id serial PRIMARY KEY,
                         province_image text NOT NULL,
@@ -76,8 +83,9 @@ cur.execute("""
             """)
 
 # Nearest Event
+cur.execute(""" DROP TABLE IF EXISTS nearest_event; """)
 cur.execute("""
-    CREATE TABLE hotels (nearest_event_id serial PRIMARY KEY,
+    CREATE TABLE nearest_event (nearest_event_id serial PRIMARY KEY,
                         event_image text NOT NULL,
                         event_name varchar (150) NOT NULL,
                         event_date varchar (100) NOT NULL,
@@ -88,6 +96,7 @@ cur.execute("""
             """)
 
 # Tourism Facilities
+cur.execute(""" DROP TABLE IF EXISTS tfacilities; """)
 cur.execute("""
     CREATE TABLE tfacilities (tfacilities_id serial PRIMARY KEY,
                         facilities_name varchar (150) NOT NULL,
@@ -106,6 +115,7 @@ cur.execute("""
             """)
 
 # Hotel Facilities
+cur.execute(""" DROP TABLE IF EXISTS hfacilities; """)
 cur.execute("""
     CREATE TABLE hfacilities (hfacilities_id serial PRIMARY KEY,
                         facilities_name varchar (150) NOT NULL,
