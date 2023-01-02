@@ -1,27 +1,13 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
-import os
-
-import psycopg2
-from dotenv import load_dotenv
+from helpers import *
 from passlib.hash import sha256_crypt
-
-load_dotenv()
 
 register = Blueprint('register', __name__)
 cors = CORS(register, resources={r"/v1/*": {"origins": "*"}})
 
-def init_db():
-    conn = psycopg2.connect(
-        host="localhost",
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USERNAME'),
-        password=os.getenv('DB_PASSWORD'))
-    
-    return conn
-
 @register.route("/v1/register", methods = ['POST'])
-def register_user():
+def registerUser():
     name = request.form.get('name')
     email = request.form.get('email')
     password = request.form.get('password')
@@ -38,7 +24,7 @@ def register_user():
 
         return jsonify(return_json)
     else:
-        conn = init_db()
+        conn = initializeDB()
         cur = conn.cursor()
 
         hashedPass = sha256_crypt.hash(password)
@@ -64,10 +50,10 @@ def register_user():
             }
         }
 
-        return jsonify(return_json)
+        return return_json
 
 def isEmailTaken(email):
-    conn = init_db()
+    conn = initializeDB()
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM users WHERE email = %s;", (email,))
