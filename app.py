@@ -1,7 +1,7 @@
 from flask import Flask
 from controllers.auth.register import register
 from controllers.auth.login import login
-from controllers.tourism.nearest_event import nearestEvent
+from controllers.nearest_event.nearest_event import nearestEvent
 from flask_jwt_extended import JWTManager
 from helpers import initializeENV
 
