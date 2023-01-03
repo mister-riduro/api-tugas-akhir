@@ -16,9 +16,9 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 # User
-cur.execute(""" DROP TABLE IF EXISTS users; """)
+cur.execute(""" DROP TABLE IF EXISTS users CASCADE; """)
 cur.execute("""
-    CREATE TABLE users (user_id serial PRIMARY KEY,
+    CREATE TABLE users (user_id SERIAL PRIMARY KEY,
                         name varchar (150) NOT NULL,
                         email varchar (100) NOT NULL,
                         password varchar (100) NOT NULL,
@@ -29,9 +29,9 @@ cur.execute("""
             """)
 
 # Hotel
-cur.execute(""" DROP TABLE IF EXISTS hotels; """)
+cur.execute(""" DROP TABLE IF EXISTS hotels CASCADE; """)
 cur.execute("""
-    CREATE TABLE hotels (hotel_id serial PRIMARY KEY,
+    CREATE TABLE hotels (hotel_id SERIAL PRIMARY KEY,
                         hotel_image text NOT NULL,
                         hotel_name varchar (150) NOT NULL,
                         property_type varchar (100) NOT NULL,
@@ -47,17 +47,18 @@ cur.execute("""
             """)
 
 # Provinsi
-cur.execute(""" DROP TABLE IF EXISTS provinces; """)
+cur.execute(""" DROP TABLE IF EXISTS provinces CASCADE; """)
 cur.execute("""
-    CREATE TABLE provinces (province_id serial PRIMARY KEY,
+    CREATE TABLE provinces (province_id SERIAL PRIMARY KEY,
                         province_image text NOT NULL,
                         created_at date DEFAULT CURRENT_TIMESTAMP,
                         updated_at date DEFAULT CURRENT_TIMESTAMP);
             """)
 
 # Wisata
+cur.execute(""" DROP TABLE IF EXISTS tourisms CASCADE; """)
 cur.execute("""
-    CREATE TABLE tourisms (tourism_id serial PRIMARY KEY,
+    CREATE TABLE tourisms (tourism_id SERIAL PRIMARY KEY,
                             tourism_name text NOT NULL,
                             tourism_address text NOT NULL,
                             tourism_type varchar (100) NOT NULL,
@@ -83,12 +84,13 @@ cur.execute("""
             """)
 
 # Nearest Event
-cur.execute(""" DROP TABLE IF EXISTS nearest_event; """)
+cur.execute(""" DROP TABLE IF EXISTS nearest_event CASCADE; """)
 cur.execute("""
-    CREATE TABLE nearest_event (nearest_event_id serial PRIMARY KEY,
-                        event_image text NOT NULL,
+    CREATE TABLE nearest_event (nearest_event_id SERIAL PRIMARY KEY,
+                        event_image varchar(255) NOT NULL,
                         event_name varchar (150) NOT NULL,
-                        event_date varchar (100) NOT NULL,
+                        event_start_date varchar (100) NOT NULL,
+                        event_end_date varchar (100) NOT NULL,
                         event_location text NOT NULL,
                         event_description text NOT NULL,
                         created_at date DEFAULT CURRENT_TIMESTAMP,
@@ -96,9 +98,9 @@ cur.execute("""
             """)
 
 # Tourism Facilities
-cur.execute(""" DROP TABLE IF EXISTS tfacilities; """)
+cur.execute(""" DROP TABLE IF EXISTS tfacilities CASCADE; """)
 cur.execute("""
-    CREATE TABLE tfacilities (tfacilities_id serial PRIMARY KEY,
+    CREATE TABLE tfacilities (tfacilities_id SERIAL PRIMARY KEY,
                         facilities_name varchar (150) NOT NULL,
                         facilities_image text NOT NULL,
                         created_at date DEFAULT CURRENT_TIMESTAMP,
@@ -106,6 +108,7 @@ cur.execute("""
             """)
 
 # Pivot Table Tourism Facilities
+cur.execute(""" DROP TABLE IF EXISTS tourism_facilities CASCADE; """)
 cur.execute("""
     CREATE TABLE tourism_facilities (
                         tfacilities_id integer REFERENCES tfacilities(tfacilities_id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -115,9 +118,9 @@ cur.execute("""
             """)
 
 # Hotel Facilities
-cur.execute(""" DROP TABLE IF EXISTS hfacilities; """)
+cur.execute(""" DROP TABLE IF EXISTS hfacilities CASCADE; """)
 cur.execute("""
-    CREATE TABLE hfacilities (hfacilities_id serial PRIMARY KEY,
+    CREATE TABLE hfacilities (hfacilities_id SERIAL PRIMARY KEY,
                         facilities_name varchar (150) NOT NULL,
                         facilities_image text NOT NULL,
                         created_at date DEFAULT CURRENT_TIMESTAMP,
@@ -125,6 +128,7 @@ cur.execute("""
             """)
 
 # Pivot Table Hotel Facilities
+cur.execute(""" DROP TABLE IF EXISTS hotel_facilities CASCADE; """)
 cur.execute("""
     CREATE TABLE hotel_facilities (
                         hfacilities_id integer REFERENCES hfacilities(hfacilities_id) ON UPDATE CASCADE ON DELETE CASCADE,
