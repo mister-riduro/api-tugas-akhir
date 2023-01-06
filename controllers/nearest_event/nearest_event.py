@@ -199,18 +199,19 @@ def getAllNearestEvent():
 
     output = []
 
-    for item in events:
-        output.append({
-            'id' : item[0],
-            'image' : item[1],
-            'name' : item[2],
-            'start_date' : item[3],
-            'end_date' : item[4],
-            'location' : item[5],
-            'description' : item[6],
-            'created_at' : item[7],
-            'updated_at' : item[8]
-        })
+    if len(events) != 0:
+        for item in events:
+            output.append({
+                'id' : item[0],
+                'image' : item[1],
+                'name' : item[2],
+                'start_date' : item[3],
+                'end_date' : item[4],
+                'location' : item[5],
+                'description' : item[6],
+                'created_at' : item[7],
+                'updated_at' : item[8]
+            })
 
     return_json = {
                 "status" : 200,

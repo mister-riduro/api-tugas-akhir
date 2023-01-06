@@ -21,7 +21,7 @@ def loginUser():
     res_db = cur.fetchone()
     cur.close()
 
-    if len(res_db) == 0:
+    if res_db is None:
         return_json = {
             "status" : 404,
             "message" : "account doesn't exist",
