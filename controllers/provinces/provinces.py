@@ -21,14 +21,16 @@ def getAllProvinces():
     provinces = cur.fetchall()
 
     result = []
-    for item in provinces:
-        result.append({
-            'id' : item[0],
-            'image' : item[1],
-            'name' : item[2],
-            'created_at' : item[3],
-            'updated_at' : item[4]
-        })
+
+    if len(provinces) != 0:
+        for item in provinces:
+            result.append({
+                'id' : item[0],
+                'image' : item[1],
+                'name' : item[2],
+                'created_at' : item[3],
+                'updated_at' : item[4]
+            })
 
     return_json = {
                 "status" : 200,
