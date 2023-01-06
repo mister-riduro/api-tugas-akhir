@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 
@@ -65,12 +65,7 @@ def createTourism():
     province = cur.fetchone()
 
     if province is None:
-        return_json = {
-            "status" : 404,
-            "message" : "province not found"
-        }
-
-        return return_json
+        return responseFailJSON(404, "province not found")
     
     provinceName = province[2]
 
@@ -327,11 +322,6 @@ def updateTourism(tourism_id):
     conn = initializeDB()
     cur = conn.cursor()
 
-    if request.files['image'].filename == '':
-        tourismImageURL = ""
-    else:
-        tourismImageURL = uploadImage(tourismImage)
-
     cur.execute("SELECT * FROM tourisms WHERE tourism_id = %s", (tourism_id,))
     checkTourism = cur.fetchone()
 
@@ -342,6 +332,13 @@ def updateTourism(tourism_id):
         }
 
         return return_json
+    
+    if request.files['image'].filename == '' and result[1] == "":
+        tourismImageURL = ""
+    elif request.files['image'].filename == '' and result[1] != "":
+        tourismImageURL = result[1]
+    else:
+        tourismImageURL = uploadImage(tourismImage)
 
     # Tourism Type
     cur.execute("SELECT * FROM tourism_type WHERE tourism_type_id = %s;", (tourismTypeID,))

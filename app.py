@@ -6,6 +6,8 @@ from controllers.provinces.provinces import provinces
 from controllers.tourism_facilities.tourism_facilities import tourismFacilities
 from controllers.tourisms.tourisms import tourisms
 from controllers.tourism_type.tourism_type import tourism_type
+from controllers.hotel_facilities.hotel_facilities import hotel_facilities
+from controllers.hotels.hotels import hotels
 from flask_jwt_extended import JWTManager
 from helpers import initializeENV
 
@@ -23,6 +25,8 @@ app.register_blueprint(provinces)
 app.register_blueprint(tourismFacilities)
 app.register_blueprint(tourisms)
 app.register_blueprint(tourism_type)
+app.register_blueprint(hotel_facilities)
+app.register_blueprint(hotels)
 JWTManager(app)
 
 if __name__ == "__app__":
