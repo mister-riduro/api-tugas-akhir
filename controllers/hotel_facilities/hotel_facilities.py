@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 
@@ -46,14 +46,7 @@ def createHotelFacilities():
     cur.execute("SELECT * FROM hfacilities WHERE hfacilities_id = %s;", (returningID,))
     result = cur.fetchone()
 
-    data = {
-            "id" : result[0],
-            "hotel_id" : result[1],
-            "name" : result[2],
-            "image" : result[3],
-            "created_at" : result[4],
-            "updated_at" : result[5]
-        }
+    data = insertOneData(result)
     
     return responseSuccessJSON(201, "success create facilities", data)
 
@@ -92,15 +85,7 @@ def getAllHotelFacilities():
     result = []
 
     if len(facilities) != 0:
-        for item in facilities:
-            result.append({
-                'id' : item[0],
-                'hotel_id' : item[1],
-                'name' : item[2],
-                'image' : item[3],
-                'created_at' : item[4],
-                'updated_at' : item[5]
-            })
+        result = insertMultipleData(facilities)
 
     return responseSuccessJSON(200, "success get all facilities", result)
 
@@ -140,14 +125,7 @@ def updateHotelFacilities(facil_id):
     cur.execute("SELECT * FROM hfacilities WHERE hfacilities_id = %s;", (facil_id,))
     updatedResult = cur.fetchone()
 
-    data = {
-                    "id" : updatedResult[0],
-                    "hotel_id" : updatedResult[1],
-                    "name" : updatedResult[2],
-                    "image" : updatedResult[3],
-                    "created_at" : updatedResult[4],
-                    "updated_at" : updatedResult[5]
-                }
+    data = insertOneData(updatedResult)
 
     return responseSuccessJSON(200, "success update facilities", data)
 
@@ -168,3 +146,30 @@ def deleteHotelFacilities(facil_id):
     conn.commit()
 
     return responseSuccessJSON(200, "success delete facilities", "")
+
+def insertOneData(item):
+    data = {
+        'id' : item[0],
+        'hotel_id' : item[1],
+        'name' : item[2],
+        'image' : item[3],
+        'created_at' : item[4],
+        'updated_at' : item[5]
+    }
+
+    return data
+
+def insertMultipleData(items):
+    datas = []
+
+    for item in items:
+        datas.append({
+            'id' : item[0],
+            'hotel_id' : item[1],
+            'name' : item[2],
+            'image' : item[3],
+            'created_at' : item[4],
+            'updated_at' : item[5]
+        })
+    
+    return datas

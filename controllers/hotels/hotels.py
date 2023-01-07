@@ -204,7 +204,7 @@ def updateHotel(hotel_id):
 
 @hotels.route("/v1/hotel/<hotel_id>", methods = ['DELETE'])
 @jwt_required()
-def getOneHotel(hotel_id):
+def deleteHotel(hotel_id):
     conn = initializeDB()
     cur = conn.cursor()
 

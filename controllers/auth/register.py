@@ -17,12 +17,7 @@ def registerUser():
     res = isEmailTaken(email)
 
     if res:
-        return_json = {
-            "status" : 400,
-            "message" : "account already exist",
-        }
-
-        return jsonify(return_json)
+        return responseFailJSON(400, "account already existed")
     else:
         conn = initializeDB()
         cur = conn.cursor()
@@ -37,20 +32,16 @@ def registerUser():
 
         cur.close()
 
-        return_json = {
-            "status" : 201,
-            "message" : "user registered",
-            "data" : {
-                "id" : res[0],
-                "name" : name,
-                "email" : email,
-                "password" : hashedPass,
-                "province" : province,
-                "city" : city
-            }
+        data = {
+            "id" : res[0],
+            "name" : res[1],
+            "email" : res[2],
+            "password" : res[3],
+            "province" : res[4],
+            "city" : res[5]
         }
 
-        return return_json
+        return responseSuccessJSON(201, "success register user", data)
 
 def isEmailTaken(email):
     conn = initializeDB()
