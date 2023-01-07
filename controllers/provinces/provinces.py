@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 
@@ -32,13 +32,7 @@ def getAllProvinces():
                 'updated_at' : item[4]
             })
 
-    return_json = {
-                "status" : 200,
-                "message" : "success get all provinces",
-                "data" : result
-            }
-
-    return return_json
+    return responseSuccessJSON(200, "success get all provinces", result)
 
 @provinces.route("/v1/provinces/<province_id>", methods=['GET'])
 @jwt_required()
@@ -50,26 +44,17 @@ def getOneProvinces(province_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-                "status" : 404,
-                "message" : "province not found"
-        }
+        return responseFailJSON(404, "province not found")
 
-        return return_json
+    data = {
+        'id' : result[0],
+        'image' : result[1],
+        'name' : result[2],
+        'created_at' : result[3],
+        'updated_at' : result[4]
+    }
 
-    return_json = {
-                "status" : 200,
-                "message" : "success get provinces",
-                "data" : {
-                            'id' : result[0],
-                            'image' : result[1],
-                            'name' : result[2],
-                            'created_at' : result[3],
-                            'updated_at' : result[4]
-                        }
-                }
-
-    return return_json
+    return responseSuccessJSON(200, "success get province", data)
 
 @provinces.route("/v1/provinces", methods = ['POST'])
 @jwt_required()
@@ -90,12 +75,7 @@ def createProvinces():
     
     isDuplicate = checkDuplicate(provinceName)
     if isDuplicate:
-        return_json = {
-                "status" : 400,
-                "message" : "province already exist",
-            }
-
-        return return_json
+        return responseFailJSON(400, "province already exist")
 
     cur.execute("INSERT INTO provinces (province_image, province_name, created_at, updated_at) VALUES (%s, %s, %s, %s) RETURNING province_id;", (provinceImageURL, provinceName, createdAt, updatedAt))
     conn.commit()
@@ -106,19 +86,15 @@ def createProvinces():
 
     cur.close()
 
-    return_json = {
-                "status" : 200,
-                "message" : "success create province",
-                "data" : {
-                    'id' : result[0],
-                    'image' : result[1],
-                    'name' : result[2],
-                    'created_at' : result[3],
-                    'updated_at' : result[4]
-                }
-            }
+    data = {
+        'id' : result[0],
+        'image' : result[1],
+        'name' : result[2],
+        'created_at' : result[3],
+        'updated_at' : result[4]
+    }
 
-    return return_json
+    return responseSuccessJSON(201, "success create province", data)
 
 def checkDuplicate(provinceName):
     conn = initializeDB()
@@ -158,11 +134,7 @@ def updateProvinces(province_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-                "status" : 400,
-                "message" : "province not found",
-            }
-        return return_json
+        return responseFailJSON(400, "province not found")
 
     if request.files['image'].filename == '' and result[1] == "":
         provinceImageURL = ""
@@ -180,19 +152,15 @@ def updateProvinces(province_id):
 
     cur.close()
 
-    return_json = {
-                "status" : 200,
-                "message" : "success update province",
-                "data" : {
-                    'id' : updatedResult[0],
-                    'image' : updatedResult[1],
-                    'name' : updatedResult[2],
-                    'created_at' : updatedResult[3],
-                    'updated_at' : updatedResult[4]
-                }
-            }
+    data = {
+        'id' : updatedResult[0],
+        'image' : updatedResult[1],
+        'name' : updatedResult[2],
+        'created_at' : updatedResult[3],
+        'updated_at' : updatedResult[4]
+    }
 
-    return return_json
+    return responseSuccessJSON(200, "success update province", data)
 
 @provinces.route("/v1/provinces/<province_id>", methods = ['DELETE'])
 @jwt_required()
@@ -204,11 +172,7 @@ def deleteProvinces(province_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-                "status" : 400,
-                "message" : "province not found",
-            }
-        return return_json
+        return responseFailJSON(400, "province not found")
 
 
     cur.execute("DELETE FROM provinces WHERE province_id = %s;", (province_id,))
@@ -216,10 +180,4 @@ def deleteProvinces(province_id):
 
     cur.close()
 
-    return_json = {
-                "status" : 200,
-                "message" : "success delete province",
-                "data" : ""
-            }
-
-    return return_json
+    return responseSuccessJSON(200, "success delete province", "")

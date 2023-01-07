@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 
@@ -42,23 +42,9 @@ def createNearestEvent():
 
     cur.close()
 
-    return_json = {
-                "status" : 200,
-                "message" : "success create nearest event",
-                "data" : {
-                    'id' : result[0],
-                    'image' : result[1],
-                    'name' : result[2],
-                    'start_date' : result[3],
-                    'end_date' : result[4],
-                    'location' : result[5],
-                    'description' : result[6],
-                    'created_at' : result[7],
-                    'updated_at' : result[8]
-                }
-            }
+    data = insertOneData(result)
 
-    return return_json
+    return responseSuccessJSON(201, "success create nearest event", data)
 
 @nearestEvent.route("/v1/nearest-event/<event_id>", methods = ['PUT'])
 @jwt_required()
@@ -78,12 +64,7 @@ def updateNearestEvent(event_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-                "status" : 400,
-                "message" : "event not found",
-                "data" : ""
-            }
-        return return_json
+        return responseFailJSON(404, "event not found")
 
     if request.files['image'].filename == '' and result[1] == "":
         eventImageURL = ""
@@ -96,32 +77,14 @@ def updateNearestEvent(event_id):
     conn.commit()
 
     if cur.rowcount != 1:
-        return_json = {
-                "status" : 500,
-                "message" : "error update data",
-            }
-        return return_json
+        return responseFailJSON(500, "error update data")
     
     cur.execute("SELECT * FROM nearest_event WHERE nearest_event_id = %s;", (event_id,))
     resUpdated = cur.fetchone()
 
-    return_json = {
-            "status" : 200,
-            "message" : "event successfully updated",
-            "data" : {
-                'id' : resUpdated[0],
-                'image' : resUpdated[1],
-                'name' : resUpdated[2],
-                'start_date' : resUpdated[3],
-                'end_date' : resUpdated[4],
-                'location' : resUpdated[5],
-                'description' : resUpdated[6],
-                'created_at' : resUpdated[7],
-                'updated_at' : resUpdated[8]
-            }
-    }
+    data = insertOneData(resUpdated)
     
-    return return_json
+    return responseSuccessJSON(200, "success update data", data)
 
 @nearestEvent.route("/v1/nearest-event/<event_id>", methods = ['GET'])
 @jwt_required()
@@ -134,30 +97,11 @@ def getOneNearestEvent(event_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-                "status" : 400,
-                "message" : "event not found",
-                "data" : ""
-            }
-        return return_json
-    
-    return_json = {
-        "status" : 200,
-        "message" : "success get nearest event",
-        "data" : {
-            'id' : result[0],
-            'image' : result[1],
-            'name' : result[2],
-            'start_date' : result[3],
-            'end_date' : result[4],
-            'location' : result[5],
-            'description' : result[6],
-            'created_at' : result[7],
-            'updated_at' : result[8]
-        }
-    }
+        return responseFailJSON(404, "event not found")
 
-    return return_json
+    data = insertOneData(result)
+
+    return responseSuccessJSON(200, "success get nearest event", data)
 
 @nearestEvent.route("/v1/nearest-event/<event_id>", methods = ['DELETE'])
 @jwt_required()
@@ -169,22 +113,12 @@ def deleteNearestEvent(event_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-                "status" : 400,
-                "message" : "event not found",
-                "data" : ""
-            }
-        return return_json
+        return responseFailJSON(404, "event not found")
 
     cur.execute("DELETE FROM nearest_event WHERE nearest_event_id = %s", (event_id,))
     conn.commit()
 
-    return_json = {
-            "status" : 200,
-            "message" : "event deleted",
-            "data" : ""
-        }
-    return return_json
+    return responseSuccessJSON(200, "success delete event", "")
     
 
 @nearestEvent.route("/v1/nearest-event", methods = ['GET'])
@@ -200,26 +134,40 @@ def getAllNearestEvent():
     output = []
 
     if len(events) != 0:
-        for item in events:
-            output.append({
-                'id' : item[0],
-                'image' : item[1],
-                'name' : item[2],
-                'start_date' : item[3],
-                'end_date' : item[4],
-                'location' : item[5],
-                'description' : item[6],
-                'created_at' : item[7],
-                'updated_at' : item[8]
-            })
-
-    return_json = {
-                "status" : 200,
-                "message" : "success get all datas",
-                "data" : output
-            }
+        output = insertMultipleData(events)
             
-    return return_json
+    return responseSuccessJSON(200, "success get all datas", output)
 
 
+def insertOneData(item):
+    data = {
+        'id' : item[0],
+        'image' : item[1],
+        'name' : item[2],
+        'start_date' : item[3],
+        'end_date' : item[4],
+        'location' : item[5],
+        'description' : item[6],
+        'created_at' : item[7],
+        'updated_at' : item[8]
+    }
 
+    return data
+
+def insertMultipleData(items):
+    datas = []
+
+    for item in items:
+        datas.append({
+            'id' : item[0],
+            'image' : item[1],
+            'name' : item[2],
+            'start_date' : item[3],
+            'end_date' : item[4],
+            'location' : item[5],
+            'description' : item[6],
+            'created_at' : item[7],
+            'updated_at' : item[8]
+        })
+    
+    return datas

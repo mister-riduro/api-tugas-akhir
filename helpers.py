@@ -1,12 +1,8 @@
-from flask import jsonify, request
 from functools import wraps
 from dotenv import load_dotenv
 
-import jwt
 import os
 import psycopg2
-import datetime
-import jwt
 
 import cloudinary
 import cloudinary.uploader
@@ -34,3 +30,20 @@ def uploadImage(image):
     imageURL = uploadImageResult['url']
 
     return imageURL
+
+def responseSuccessJSON(statusCode, message, data):
+    return_json = {
+        "status" : statusCode,
+        "message" : message,
+        "data" : data
+    }
+
+    return return_json
+
+def responseFailJSON(statusCode, message):
+    return_json = {
+        "status" : statusCode,
+        "message" : message
+    }
+
+    return return_json

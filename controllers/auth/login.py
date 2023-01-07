@@ -22,31 +22,12 @@ def loginUser():
     cur.close()
 
     if res_db is None:
-        return_json = {
-            "status" : 404,
-            "message" : "account doesn't exist",
-        }
-
-        return return_json
+        return responseFailJSON(404, "account doesn't exist")
     
     res = sha256_crypt.verify(password, res_db[3])
 
     if res:
         token = create_access_token(identity=res_db[0])
-
-        return_json = {
-            "status" : 200,
-            "message" : "success login",
-            "data" : {
-                "token" : token
-            }
-        }
-
-        return return_json
+        return responseSuccessJSON(200, "success login", token)
     else:
-        return_json = {
-            "status" : 400,
-            "message" : "wrong email or password",
-        }
-
-        return return_json
+        return responseFailJSON(400, "wrong email or password")

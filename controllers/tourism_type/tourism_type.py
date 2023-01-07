@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required
 
@@ -29,12 +29,7 @@ def createTourismType():
     isTourismTypeDuplicated = checkTourismTypeDuplicated(tourismTypeName)
 
     if isTourismTypeDuplicated:
-        return_json = {
-            "status" : 400,
-            "message" : "tourism type already exist"
-        }
-
-        return return_json
+        return responseFailJSON(400, "tourism type already exist")
     
     cur.execute("INSERT INTO tourism_type (tourism_type_image, tourism_type_name, created_at, updated_at) VALUES (%s, %s, %s, %s) RETURNING tourism_type_id;", (tourismTypeImageURL, tourismTypeName, createdAt, updatedAt,))
     conn.commit()
@@ -44,19 +39,9 @@ def createTourismType():
     cur.execute("SELECT * FROM tourism_type WHERE tourism_type_id = %s", (returningID,))
     result = cur.fetchone()
 
-    return_json = {
-            "status" : 201,
-            "message" : "success create tourism type",
-            "data" : {
-                "id" : result[0],
-                "image" : result[1],
-                "name" : result[2],
-                "created_at" : result[3],
-                "updated_at" : result[4]
-            }
-        }
+    data = insertOneData(result)
 
-    return return_json
+    return responseSuccessJSON(201, "success create tourism type", data)
 
 
 @tourism_type.route("/v1/tourism-type/<type_id>", methods = ['PUT'])
@@ -74,12 +59,7 @@ def updateTourismType(type_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-            "status" : 404,
-            "message" : "tourism type not found"
-        }
-
-        return return_json
+        return responseFailJSON(404, "tourism type not found")
 
     if request.files['image'].filename == '' and result[1] == "":
         tourismTypeImageURL = ""
@@ -91,12 +71,7 @@ def updateTourismType(type_id):
     isTourismTypeDuplicated = checkTourismTypeDuplicated(tourismTypeName)
 
     if isTourismTypeDuplicated:
-        return_json = {
-            "status" : 400,
-            "message" : "tourism type already exist"
-        }
-
-        return return_json
+        return responseFailJSON(400, "tourism type already exist")
     
     cur.execute("UPDATE tourism_type SET tourism_type_image = %s, tourism_type_name = %s, updated_at = %s WHERE tourism_type_id = %s;", (tourismTypeImageURL, tourismTypeName, updatedAt, type_id,))
     conn.commit()
@@ -104,19 +79,9 @@ def updateTourismType(type_id):
     cur.execute("SELECT * FROM tourism_type WHERE tourism_type_id = %s", (type_id,))
     updatedResult = cur.fetchone()
 
-    return_json = {
-            "status" : 200,
-            "message" : "success update tourism type",
-            "data" : {
-                "id" : updatedResult[0],
-                "image" : updatedResult[1],
-                "name" : updatedResult[2],
-                "created_at" : updatedResult[3],
-                "updated_at" : updatedResult[4]
-            }
-        }
+    data = insertOneData(updatedResult)
 
-    return return_json
+    return responseSuccessJSON(200, "success update tourism type", data)
 
     
 @tourism_type.route("/v1/tourism-type", methods = ['GET'])
@@ -131,22 +96,9 @@ def getAllTourismType():
     result = []
 
     if len(tourismType) != 0:
-        for item in tourismType:
-            result.append({
-                "id" : item[0],
-                "image" : item[1],
-                "name" : item[2],
-                "created_at" : item[3],
-                "updated_at" : item[4]
-            })
-    
-    return_json = {
-        "status" : 200,
-        "message" : "success get all tourism type",
-        "data" : result
-    }
+        result = insertMultipleData(tourismType)
 
-    return return_json
+    return responseSuccessJSON(200, "success get all tourism type", result)
 
 @tourism_type.route("/v1/tourism-type/<type_id>", methods = ['DELETE'])
 @jwt_required()
@@ -158,23 +110,12 @@ def deleteTourismType(type_id):
     result = cur.fetchone()
 
     if result is None:
-        return_json = {
-            "status" : 404,
-            "message" : "tourism type not found"
-        }
-
-        return return_json
+        return responseFailJSON(404, "tourism type not found")
     
     cur.execute("DELETE FROM tourism_type WHERE tourism_type_id = %s;", (type_id,))
     conn.commit()
-    
-    return_json = {
-        "status" : 200,
-        "message" : "success delete tourism type",
-        "data" : ""
-    }
 
-    return return_json
+    return responseSuccessJSON(200, "success delete tourism type", "")
 
 @tourism_type.route("/v1/tourism-type/<type_id>", methods = ['GET'])
 @jwt_required()
@@ -185,19 +126,9 @@ def getOneTourismType(type_id):
     cur.execute("SELECT * FROM tourism_type WHERE tourism_type_id = %s", (type_id,))
     result = cur.fetchone()
     
-    return_json = {
-        "status" : 200,
-        "message" : "success get all tourism type",
-        "data" : {
-            "id" : result[0],
-            "image" : result[1],
-            "name" : result[2],
-            "created_at" : result[3],
-            "updated_at" : result[4]
-        }
-    }
+    data = insertOneData(result)
 
-    return return_json
+    return responseSuccessJSON(200, "success get tourism type", data)
 
 
 def checkTourismTypeDuplicated(tourismTypeName):
@@ -221,3 +152,28 @@ def checkTourismTypeDuplicated(tourismTypeName):
                 return True
 
         return False
+
+def insertOneData(item):
+    data = {
+            "id" : item[0],
+            "image" : item[1],
+            "name" : item[2],
+            "created_at" : item[3],
+            "updated_at" : item[4]
+        }
+
+    return data
+
+def insertMultipleData(items):
+    datas = []
+
+    for item in items:
+        datas.append({
+            "id" : item[0],
+            "image" : item[1],
+            "name" : item[2],
+            "created_at" : item[3],
+            "updated_at" : item[4]
+        })
+    
+    return datas
