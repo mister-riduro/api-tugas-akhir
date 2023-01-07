@@ -119,7 +119,7 @@ def updateHotelFacilities(facil_id):
     else:
         facilitiesImageURL = uploadImage(facilitiesImage)
     
-    cur.execute("UPDATE hfacilities SET facilities_image = %s, facilities_name = %s, hotel_id = %s, updated_at = %s WHERE hfacilities_id = %s;", (facilitiesImageURL, facilitiesName, hotelID, updatedAt))
+    cur.execute("UPDATE hfacilities SET facilities_image = %s, facilities_name = %s, hotel_id = %s, updated_at = %s WHERE hfacilities_id = %s;", (facilitiesImageURL, facilitiesName, updatedAt, hotelID))
     conn.commit()
 
     cur.execute("SELECT * FROM hfacilities WHERE hfacilities_id = %s;", (facil_id,))
