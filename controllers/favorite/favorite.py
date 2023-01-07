@@ -17,13 +17,16 @@ def addHotelFavorite(hotel_id):
 
     userID = get_jwt_identity()
 
+    createdAt = datetime.now()
+    updatedAt = datetime.now()
+
     cur.execute("SELECT * FROM hotels WHERE hotel_id = %s", (hotel_id,))
     result = cur.fetchone()
 
     if result is None:
         return responseFailJSON(404, "hotel not found")
     
-    cur.execute("INSERT INTO favorite_hotel(user_id, hotel_id) VALUES(%s, %s);", (userID, hotel_id))
+    cur.execute("INSERT INTO favorite_hotel(user_id, hotel_id, created_at, updated_at) VALUES(%s, %s, %s, %s);", (userID, hotel_id, createdAt, updatedAt))
     conn.commit()
 
     return responseSuccessJSON(201, "success add hotel to favorite", "")
@@ -59,13 +62,16 @@ def addTourismFavorite(tourism_id):
 
     userID = get_jwt_identity()
 
+    createdAt = datetime.now()
+    updatedAt = datetime.now()
+
     cur.execute("SELECT * FROM tourisms WHERE tourism_id = %s", (tourism_id,))
     result = cur.fetchone()
 
     if result is None:
         return responseFailJSON(404, "tourism not found")
     
-    cur.execute("INSERT INTO favorite_tourism(user_id, tourism_id) VALUES(%s, %s);", (userID, tourism_id))
+    cur.execute("INSERT INTO favorite_tourism(user_id, tourism_id, created_at, updated_at) VALUES(%s, %s, %s, %s);", (userID, tourism_id, createdAt, updatedAt))
     conn.commit()
 
     return responseSuccessJSON(201, "success add tourism to favorite", "")
