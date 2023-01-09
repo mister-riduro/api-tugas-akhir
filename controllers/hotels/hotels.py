@@ -104,7 +104,7 @@ def getAllHotel():
     result = []
 
     if len(hotel) != 0:
-        result = insertMultipleData(hotel)
+        result = insertMultipleData(hotel, cur)
     
     return responseSuccessJSON(200, "success get all hotel", result)
 
@@ -120,7 +120,24 @@ def getOneHotel(hotel_id):
     if result is None:
         return responseFailJSON(404, "hotel not found")
     
-    return responseSuccessJSON(200, "success get hotel", result)
+    cur.execute("SELECT hfacilities.hfacilities_id, hfacilities.facilities_name, hfacilities.facilities_image FROM tourisms JOIN hfacilities ON hfacilities.hotel_id = %s", (hotel_id,))
+    fetchedFacilties = cur.fetchall()
+
+    facilities = []
+
+    if len(fetchedFacilties) == 0:
+        facilities = []
+    else:
+        for facil in fetchedFacilties:
+            facilities.append({
+                "id" : facil[0],
+                "name" : facil[1],
+                "image" : facil[2]
+            })
+
+    data = insertOneData(result, facilities)
+    
+    return responseSuccessJSON(200, "success get hotel", data)
 
 
 @hotels.route("/v1/hotel/<hotel_id>", methods = ['PUT'])
@@ -198,6 +215,21 @@ def updateHotel(hotel_id):
     cur.execute("SELECT * FROM hotels WHERE hotel_id = %s", (hotel_id))
     updatedResult = cur.fetchone()
 
+    cur.execute("SELECT hfacilities.hfacilities_id, hfacilities.facilities_name, hfacilities.facilities_image FROM tourisms JOIN hfacilities ON hfacilities.hotel_id = %s", (hotel_id,))
+    fetchedFacilties = cur.fetchall()
+
+    facilities = []
+
+    if len(fetchedFacilties) == 0:
+        facilities = []
+    else:
+        for item in fetchedFacilties:
+            facilities.append({
+                "id" : item[0],
+                "name" : item[1],
+                "image" : item[2]
+            })
+
     data = insertOneData(updatedResult)
 
     return responseSuccessJSON(200, "success update hotel", data)
@@ -219,7 +251,7 @@ def deleteHotel(hotel_id):
     
     return responseSuccessJSON(200, "success delete hotel", "")
 
-def insertOneData(item):
+def insertOneData(item, facilities):
     data = {
         "id" : item[0],
         "image" : item[1],
@@ -232,6 +264,7 @@ def insertOneData(item):
         "rating" : item[8],
         "min_price" : item[9],
         "max_price" : item[10],
+        "facilities" : facilities,
         "latitude" : item[11],
         "longitude" : item[12],
         "created_at" : item[13],
@@ -240,10 +273,26 @@ def insertOneData(item):
 
     return data
 
-def insertMultipleData(items):
+def insertMultipleData(items, cur):
     datas = []
 
     for item in items:
+        cur.execute("SELECT hfacilities.hfacilities_id, hfacilities.facilities_name FROM tourisms JOIN hfacilities ON hfacilities.hotel_id = %s", (item[0],))
+        fetchedFacilties = cur.fetchall()
+
+        facilities = []
+
+        if len(fetchedFacilties) == 0:
+            facilities = []
+        else:
+            for facil in fetchedFacilties:
+                facilities.append({
+                    "id" : facil[0],
+                    "name" : facil[2],
+                    "image" : facil[3]
+                })
+
+
         datas.append({
             "id" : item[0],
             "image" : item[1],
@@ -256,6 +305,7 @@ def insertMultipleData(items):
             "rating" : item[8],
             "min_price" : item[9],
             "max_price" : item[10],
+            "facilities" : facilities,
             "latitude" : item[11],
             "longitude" : item[12],
             "created_at" : item[13],

@@ -31,6 +31,31 @@ def addHotelFavorite(hotel_id):
 
     return responseSuccessJSON(201, "success add hotel to favorite", "")
 
+@favorite.route("/v1/favorite/h", methods = ['GET'])
+@jwt_required()
+def getHotelFavorite():
+    conn = initializeDB()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM favorite_hotel;")
+    favorite_hotels = cur.fetchall()
+    cur.close()
+
+    result = []
+
+    if len(favorite_hotels) != 0:
+        for item in favorite_hotels:
+            result.append({
+                'id' : item[0],
+                'user_id' : item[1],
+                'hotel_id' : item[2],
+                'created_at' : item[3],
+                'updated_at' : item[4]
+            })
+
+
+    return responseSuccessJSON(201, "success get favorite hotel", result)
+
 @favorite.route("/v1/favorite/h/r/<hotel_id>", methods = ['DELETE'])
 @jwt_required()
 def removeHotelFavorite(hotel_id):
@@ -98,3 +123,28 @@ def removeTourismFavorite(tourism_id):
     conn.commit()
 
     return responseSuccessJSON(200, "success delete tourism from favorite", "")
+
+@favorite.route("/v1/favorite/t", methods = ['GET'])
+@jwt_required()
+def getTourismFavorite():
+    conn = initializeDB()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM favortie_tourism;")
+    favorite_tourisms = cur.fetchall()
+    cur.close()
+
+    result = []
+
+    if len(favorite_tourisms) != 0:
+        for item in favorite_tourisms:
+            result.append({
+                'id' : item[0],
+                'user_id' : item[1],
+                'tourism_id' : item[2],
+                'created_at' : item[3],
+                'updated_at' : item[4]
+            })
+
+
+    return responseSuccessJSON(201, "success get favorite tourism", result)
