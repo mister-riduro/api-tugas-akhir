@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, json, request
 from controllers.auth.register import register
 from controllers.auth.login import login
 from controllers.nearest_event.nearest_event import nearestEvent
@@ -9,8 +9,10 @@ from controllers.tourism_type.tourism_type import tourism_type
 from controllers.hotel_facilities.hotel_facilities import hotelFacilities
 from controllers.hotels.hotels import hotels
 from controllers.favorite.favorite import favorite
+from controllers.recommendation.recommendation import recommendation
+from controllers.users.users import users
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt
-from helpers import initializeENV
+from helpers import *
 from datetime import timedelta
 
 import os
@@ -32,6 +34,8 @@ app.register_blueprint(tourism_type)
 app.register_blueprint(hotelFacilities)
 app.register_blueprint(hotels)
 app.register_blueprint(favorite)
+app.register_blueprint(recommendation)
+app.register_blueprint(users)
 jwt = JWTManager(app)
 
 jwt_redis_blocklist = redis.Redis(
@@ -59,5 +63,5 @@ def logoutUser():
 
     return return_json
 
-if __name__ == "__app__":
+if __name__ == "__main__":
     app.run()

@@ -21,6 +21,7 @@ def createHotel():
     hotelRating = request.form.get('rating')
     minPrice = request.form.get('min_price')
     maxPrice = request.form.get('max_price')
+    cluster = request.form.get('cluster')
     latitude = request.form.get('latitude')
     longitude = request.form.get('longitude')
 
@@ -63,9 +64,10 @@ def createHotel():
                     max_price,
                     lattitude,
                     longitude,
+                    cluster,
                     created_at,
                     updated_at
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING hotel_id;""",
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING hotel_id;""",
                     (hotelImageURL,
                     hotelName, 
                     propertyType, 
@@ -78,6 +80,7 @@ def createHotel():
                     minPrice, 
                     latitude,
                     longitude,
+                    cluster,
                     createdAt,
                     updatedAt,)
                 )
@@ -87,7 +90,7 @@ def createHotel():
     cur.execute("SELECT * FROM hotels WHERE hotel_id = %s", (returningID,))
     result = cur.fetchone()
 
-    data = insertOneData(result)
+    data = insertOneData(result, [])
 
     return responseSuccessJSON(201, "success create hotel", data)
 
@@ -152,6 +155,7 @@ def updateHotel(hotel_id):
     hotelRating = request.form.get('rating')
     minPrice = request.form.get('min_price')
     maxPrice = request.form.get('max_price')
+    cluster = request.form.get('cluster')
     latitude = request.form.get('latitude')
     longitude = request.form.get('longitude')
 
@@ -195,6 +199,7 @@ def updateHotel(hotel_id):
                     max_price = %s,
                     lattitude = %s,
                     longitude = %s,
+                    cluster = %s,
                     updated_at = %s;""",
                     (hotelImageURL,
                     hotelName, 
@@ -204,10 +209,11 @@ def updateHotel(hotel_id):
                     provinceName,
                     hotelAddress,
                     hotelRating,
-                    maxPrice,
-                    minPrice, 
+                    minPrice,
+                    maxPrice, 
                     latitude,
                     longitude,
+                    cluster,
                     updatedAt,)
                 )
     conn.commit()
@@ -252,6 +258,9 @@ def deleteHotel(hotel_id):
     return responseSuccessJSON(200, "success delete hotel", "")
 
 def insertOneData(item, facilities):
+    if facilities == []:
+        facilities = []
+
     data = {
         "id" : item[0],
         "image" : item[1],
@@ -267,8 +276,9 @@ def insertOneData(item, facilities):
         "facilities" : facilities,
         "latitude" : item[11],
         "longitude" : item[12],
-        "created_at" : item[13],
-        "updated_at" : item[14]
+        "cluster" : item[13],
+        "created_at" : item[14],
+        "updated_at" : item[15]
     }
 
     return data
@@ -308,8 +318,9 @@ def insertMultipleData(items, cur):
             "facilities" : facilities,
             "latitude" : item[11],
             "longitude" : item[12],
-            "created_at" : item[13],
-            "updated_at" : item[14]
+            "cluster" : item[13],
+            "created_at" : item[14],
+            "updated_at" : item[15]
         })
     
     return datas
