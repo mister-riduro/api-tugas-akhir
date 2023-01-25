@@ -11,8 +11,14 @@ import numpy as np
 recommendation = Blueprint('recommendation', __name__)
 cors = CORS(recommendation, resources={r"/v1/*": {"origins": "*"}})
 
-kmeans = joblib.load('D:/College/final-project/api_ta/controllers/recommendation/kmeans.pkl')
-# scaler = joblib.load('D:/College/final-project/api_ta/controllers/recommendation/scaler.pkl')
+MAX_FACIL_RATE = 10.5
+MIN_FACIL_RATE = 0.0
+MAX_HOTEL_RATE = 5.0
+MIN_HOTEL_RATE = 0.0
+
+kmeans = joblib.load('D:/College/final-project/api_ta/controllers/recommendation/kmeans.joblib')
+print(kmeans)
+scaler = joblib.load('D:/College/final-project/api_ta/controllers/recommendation/scaler.joblib')
 
 @recommendation.route("/v1/recommend", methods = ['POST'])
 @jwt_required()
@@ -83,11 +89,18 @@ def insertMultipleData(items, cur):
     return datas
 
 def recommend(score, hotelRating):
-    new_param = [[hotelRating, score]]
+    normalizedHotelRate = (hotelRating - MIN_HOTEL_RATE) / (MAX_HOTEL_RATE - MIN_HOTEL_RATE)
+    normalizedFacilRate = (score - MIN_FACIL_RATE) / (MAX_FACIL_RATE - MIN_FACIL_RATE)
+
+    print("facil : ", normalizedFacilRate)
+    print("hotel : ", normalizedHotelRate)
+
+    new_param = [[normalizedHotelRate, normalizedFacilRate]]
     new_param = np.array(new_param)
 
-    scaler = MinMaxScaler()
-    param_scaled = scaler.fit_transform(new_param)
+    print(type(scaler))
+    # scaler = MinMaxScaler()
+    param_scaled = scaler.transform(new_param)
 
     result = kmeans.predict(param_scaled)
     print(result)
@@ -108,5 +121,4 @@ def calculateRate(facilities):
                 rate_score += datas['facilities'][i]['rating']
             i += 1
     
-    print(rate_score)
     return rate_score
