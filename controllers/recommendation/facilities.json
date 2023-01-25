@@ -6,67 +6,59 @@
         },
         {
             "name" : "tiket CLEAN",
-            "rating" : 0.571429
+            "rating" : 0.571428571428571
         },
         {
             "name" : "Kolam Renang",
-            "rating" : 0.850000
+            "rating" : 0.85
         },
         {
             "name" : "WiFi",
-            "rating" : 0.942857
+            "rating" : 0.942857142857143
         },
         {
             "name" : "Parkir",
-            "rating" : 0.857143
+            "rating" : 0.857142857142857
         },
         {
             "name" : "Restoran",
-            "rating" : 0.707143
+            "rating" : 0.707142857142857
         },
         {
             "name" : "Resepsionis 24 Jam",
-            "rating" : 0.857143
-        },
-        {
-            "name" : "Parkir",
-            "rating" : 0.857143
+            "rating" : 0.857142857142857
         },
         {
             "name" : "Lift",
-            "rating" : 0.921429
+            "rating" : 0.921428571428571
         },
         {
             "name" : "AC",
-            "rating" : 0.985714
-        },
-        {
-            "name" : "Parkir",
-            "rating" : 0.857143
+            "rating" : 0.985714285714286
         },
         {
             "name" : "Pusat Kebugaran",
-            "rating" : 0.650000
+            "rating" : 0.65
         },
         {
             "name" : "Antar Jemput Bandara",
-            "rating" : 0.700000
+            "rating" : 0.7
         },
         {
             "name" : "Fasilitas Rapat",
-            "rating" : 0.657143
+            "rating" : 0.657142857142857
         },
         {
             "name" : "Bukti Vaksin Covid-19",
-            "rating" : 0.800000
+            "rating" : 0.8
         },
         {
             "name" : "Pet-friendly",
-            "rating" : 0.528571
+            "rating" : 0.528571428571429
         },
         {
             "name" : "Perlengkapan BBQ",
-            "rating" : 0.550000
+            "rating" : 0.55
         }
     ]
 }
