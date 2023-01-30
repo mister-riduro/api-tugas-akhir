@@ -14,7 +14,7 @@ cors = CORS(hotels, resources={r"/v1/*": {"origins": "*"}})
 def createHotel():
     hotelImage = request.files['image']
     hotelName = request.form.get('name')
-    provinceID = request.form.get('province_id')
+    provinceName = request.form.get('province_name')
     propertyType = request.form.get('type')
     hotelCity = request.form.get('city')
     hotelAddress = request.form.get('address')
@@ -42,38 +42,28 @@ def createHotel():
     minPrice = int(minPrice)
     maxPrice = int(maxPrice)
 
-    cur.execute("SELECT * FROM provinces WHERE province_id = %s;", (provinceID,))
-    province = cur.fetchone()
-
-    if province is None:
-        return responseFailJSON(404, "province not found")
-    
-    provinceName = province[2]
-
     cur.execute("""
                 INSERT INTO hotels (
                     hotel_image,
                     hotel_name,
                     property_type,
                     hotel_city,
-                    province_id,
                     province_name,
                     hotel_address,
                     hotel_rating,
                     min_price,
                     max_price,
-                    lattitude,
+                    latitude,
                     longitude,
                     cluster,
                     created_at,
                     updated_at
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING hotel_id;""",
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING hotel_id;""",
                     (hotelImageURL,
                     hotelName, 
                     propertyType, 
                     hotelCity,
-                    provinceID, 
-                    provinceName,
+                    provinceName, 
                     hotelAddress,
                     hotelRating,
                     maxPrice,
@@ -148,7 +138,7 @@ def getOneHotel(hotel_id):
 def updateHotel(hotel_id):
     hotelImage = request.files['image']
     hotelName = request.form.get('name')
-    provinceID = request.form.get('province_id')
+    provinceName = request.form.get('province_name')
     propertyType = request.form.get('type')
     hotelCity = request.form.get('city')
     hotelAddress = request.form.get('address')
@@ -176,14 +166,6 @@ def updateHotel(hotel_id):
         hotelImageURL = result[1]
     else:
         hotelImageURL = uploadImage(hotelImage)
-
-    cur.execute("SELECT * FROM provinces WHERE province_id = %s;", (provinceID,))
-    province = cur.fetchone()
-
-    if province is None:
-        return responseFailJSON(404, "province not found")
-    
-    provinceName = province[2]
     
     cur.execute("""
                 UPDATE hotels SET
@@ -191,7 +173,6 @@ def updateHotel(hotel_id):
                     hotel_name = %s,
                     property_type = %s,
                     hotel_city = %s,
-                    province_id = %s,
                     province_name = %s,
                     hotel_address = %s,
                     hotel_rating = %s,
@@ -205,8 +186,7 @@ def updateHotel(hotel_id):
                     hotelName, 
                     propertyType, 
                     hotelCity,
-                    provinceID, 
-                    provinceName,
+                    provinceName, 
                     hotelAddress,
                     hotelRating,
                     minPrice,
@@ -267,18 +247,17 @@ def insertOneData(item, facilities):
         "name" : item[2],
         "property_type" : item[3],
         "city" : item[4],
-        "province_id" : item[5],
-        "province_name" : item[6],
-        "address" : item[7],
-        "rating" : item[8],
-        "min_price" : item[9],
-        "max_price" : item[10],
+        "province_name" : item[5],
+        "address" : item[6],
+        "rating" : item[7],
+        "min_price" : item[8],
+        "max_price" : item[9],
         "facilities" : facilities,
-        "latitude" : item[11],
-        "longitude" : item[12],
-        "cluster" : item[13],
-        "created_at" : item[14],
-        "updated_at" : item[15]
+        "latitude" : item[10],
+        "longitude" : item[11],
+        "cluster" : item[12],
+        "created_at" : item[13],
+        "updated_at" : item[14]
     }
 
     return data
@@ -309,18 +288,17 @@ def insertMultipleData(items, cur):
             "name" : item[2],
             "property_type" : item[3],
             "city" : item[4],
-            "province_id" : item[5],
-            "province_name" : item[6],
-            "address" : item[7],
-            "rating" : item[8],
-            "min_price" : item[9],
-            "max_price" : item[10],
+            "province_name" : item[5],
+            "address" : item[6],
+            "rating" : item[7],
+            "min_price" : item[8],
+            "max_price" : item[9],
             "facilities" : facilities,
-            "latitude" : item[11],
-            "longitude" : item[12],
-            "cluster" : item[13],
-            "created_at" : item[14],
-            "updated_at" : item[15]
+            "latitude" : item[10],
+            "longitude" : item[11],
+            "cluster" : item[12],
+            "created_at" : item[13],
+            "updated_at" : item[14]
         })
     
     return datas

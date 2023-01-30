@@ -15,9 +15,9 @@ def createTourism():
     tourismName = request.form.get('name')
     tourismImage = request.files['image']
     tourismAddress = request.form.get('address')
-    tourismTypeID = request.form.get('type_id')
+    tourismType = request.form.get('tourism_type')
     tourismCity = request.form.get('city')
-    provinceID = request.form.get('province_id')
+    provinceName = request.form.get('province_name')
     openHour = request.form.get('open_hour')
     closeHour = request.form.get('close_hour')
     tourismDesc = request.form.get('description')
@@ -26,7 +26,7 @@ def createTourism():
     roadCondition = request.form.get('road_condition')
 
     tourismRating = request.form.get('rating')
-    lattitude = request.form.get('lattitude')
+    latitude = request.form.get('latitude')
     longitude = request.form.get('longitude')
 
     createdAt = datetime.now()
@@ -34,7 +34,7 @@ def createTourism():
 
     # Change from string to decimal
     tourismRating = float(tourismRating)
-    lattitude = float(lattitude)
+    latitude = float(latitude)
     longitude = float(longitude)
     entryPrice = int(entryPrice)
 
@@ -46,34 +46,14 @@ def createTourism():
     else:
         tourismImageURL = uploadImage(tourismImage)
 
-    # Tourism Type
-    cur.execute("SELECT * FROM tourism_type WHERE tourism_type_id = %s;", (tourismTypeID,))
-    tourismType = cur.fetchone()
-
-    if tourismType is None:
-        return responseFailJSON(404, "tourism type not found")
-    
-    tourismTypeName = tourismType[2]
-    
-    # Province
-    cur.execute("SELECT * FROM provinces WHERE province_id = %s;", (provinceID,))
-    province = cur.fetchone()
-
-    if province is None:
-        return responseFailJSON(404, "province not found")
-    
-    provinceName = province[2]
-
     cur.execute("""
                 INSERT INTO tourisms (
                     tourism_name,
                     tourism_image,
                     tourism_address,
-                    tourism_type_id,
                     tourism_type,
                     tourism_city,
-                    province_id,
-                    tourism_province,
+                    province_name
                     open_hour,
                     close_hour,
                     tourism_description,
@@ -81,18 +61,16 @@ def createTourism():
                     traveling_time,
                     road_condition,
                     tourism_rating,
-                    lattitude,
+                    latitude,
                     longitude,
                     created_at,
                     updated_at
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tourism_id;""",
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING tourism_id;""",
                     (tourismName,
                     tourismImageURL, 
                     tourismAddress, 
-                    tourismTypeID,
-                    tourismTypeName, 
+                    tourismType,
                     tourismCity, 
-                    provinceID, 
                     provinceName, 
                     openHour,
                     closeHour,
@@ -101,7 +79,7 @@ def createTourism():
                     travelingTime,
                     roadCondition,
                     tourismRating,
-                    lattitude,
+                    latitude,
                     longitude,
                     createdAt,
                     updatedAt,)
@@ -161,6 +139,22 @@ def getAllTourism():
 
     return responseSuccessJSON(200, "success get all tourism", result)
 
+@tourisms.route("/v1/tourisms/p", methods = ['GET'])
+@jwt_required()
+def getTourismsByProvince():
+    conn = initializeDB()
+    cur = conn.cursor()
+
+    provinceName = request.json['province_name']
+
+    cur.execute("SELECT * FROM tourisms WHERE province_name = %s;", (provinceName))
+    tourism = cur.fetchall()
+
+    result = []
+    result = insertMultipleData(tourism, cur)
+
+    return responseSuccessJSON(200, "success get all tourism based on province", result)
+
 @tourisms.route("/v1/tourisms/<tourism_id>", methods = ['DELETE'])
 @jwt_required()
 def deleteTourism(tourism_id):
@@ -185,9 +179,9 @@ def updateTourism(tourism_id):
     tourismName = request.form.get('name')
     tourismImage = request.files['image']
     tourismAddress = request.form.get('address')
-    tourismTypeID = request.form.get('type_id')
+    tourismType = request.form.get('tourism_type')
     tourismCity = request.form.get('city')
-    provinceID = request.form.get('province_id')
+    provinceName = request.form.get('province_name')
     openHour = request.form.get('open_hour')
     closeHour = request.form.get('close_hour')
     tourismDesc = request.form.get('description')
@@ -203,7 +197,7 @@ def updateTourism(tourism_id):
 
     # Change from string to decimal
     tourismRating = float(tourismRating)
-    lattitude = float(lattitude)
+    latitude = float(lattitude)
     longitude = float(longitude)
     entryPrice = int(entryPrice)
 
@@ -223,33 +217,14 @@ def updateTourism(tourism_id):
     else:
         tourismImageURL = uploadImage(tourismImage)
 
-    # Tourism Type
-    cur.execute("SELECT * FROM tourism_type WHERE tourism_type_id = %s;", (tourismTypeID,))
-    tourismType = cur.fetchone()
-    if tourismType is None:
-        return responseFailJSON(404, "tourism type not found")
-    
-    tourismTypeName = tourismType[2]
-
-    # Province
-    cur.execute("SELECT * FROM provinces WHERE province_id = %s;", (provinceID,))
-    province = cur.fetchone()
-
-    if province is None:
-        return responseFailJSON(404, "province not found")
-    
-    provinceName = province[2]
-
     cur.execute("""
                 UPDATE tourisms SET
                     tourism_name = %s,
                     tourism_image = %s,
                     tourism_address = %s,
-                    tourism_type_id = %s,
                     tourism_type = %s,
                     tourism_city = %s,
-                    province_id = %s,
-                    tourism_province = %s,
+                    province_name = %s,
                     open_hour = %s,
                     close_hour = %s,
                     tourism_description = %s,
@@ -257,16 +232,14 @@ def updateTourism(tourism_id):
                     traveling_time = %s,
                     road_condition = %s,
                     tourism_rating = %s,
-                    lattitude = %s,
+                    latitude = %s,
                     longitude = %s,
-                    updated_at = %s WHERE province_id = %s;""",
+                    updated_at = %s WHERE tourism_id = %s;""",
                     (tourismName,
                     tourismImageURL, 
                     tourismAddress, 
-                    tourismTypeID,
-                    tourismTypeName, 
+                    tourismType,
                     tourismCity, 
-                    provinceID, 
                     provinceName, 
                     openHour,
                     closeHour,
@@ -275,7 +248,7 @@ def updateTourism(tourism_id):
                     travelingTime,
                     roadCondition,
                     tourismRating,
-                    lattitude,
+                    latitude,
                     longitude,
                     updatedAt,
                     tourism_id,)
@@ -310,23 +283,21 @@ def insertOneData(item, facilities):
             "image" : item[1],
             "name" : item[2],
             "address" : item[3],
-            "type_id" : item[4],
-            "type" : item[5],
-            "city" : item[6],
-            "province_id" : item[7],
-            "province" : item[8],
-            "open_hour" : item[9],
-            "close_hour" : item[10],
-            "description" : item[11],
-            "entry_price" : item[12],
+            "type" : item[4],
+            "city" : item[5],
+            "province_name" : item[6],
+            "open_hour" : item[7],
+            "close_hour" : item[8],
+            "description" : item[9],
+            "entry_price" : item[10],
             "facilities" : facilities,
-            "traveling_time" : item[13],
-            "road_condition" : item[14],
-            "rating" : item[15],
-            "lattitude" : item[16],
-            "longitude" : item[17],
-            "created_at" : item[18],
-            "updated_at" : item[19]
+            "traveling_time" : item[11],
+            "road_condition" : item[12],
+            "rating" : item[13],
+            "lattitude" : item[14],
+            "longitude" : item[15],
+            "created_at" : item[16],
+            "updated_at" : item[17]
         }
 
     return data
@@ -353,23 +324,21 @@ def insertMultipleData(items, cur):
             "image" : item[1],
             "name" : item[2],
             "address" : item[3],
-            "type_id" : item[4],
-            "type" : item[5],
-            "city" : item[6],
-            "province_id" : item[7],
-            "province" : item[8],
-            "open_hour" : item[9],
-            "close_hour" : item[10],
-            "description" : item[11],
-            "entry_price" : item[12],
+            "type" : item[4],
+            "city" : item[5],
+            "province_name" : item[6],
+            "open_hour" : item[7],
+            "close_hour" : item[8],
+            "description" : item[9],
+            "entry_price" : item[10],
             "facilities" : facilities,
-            "traveling_time" : item[13],
-            "road_condition" : item[14],
-            "rating" : item[15],
-            "lattitude" : item[16],
-            "longitude" : item[17],
-            "created_at" : item[18],
-            "updated_at" : item[19]
+            "traveling_time" : item[11],
+            "road_condition" : item[12],
+            "rating" : item[13],
+            "lattitude" : item[14],
+            "longitude" : item[15],
+            "created_at" : item[16],
+            "updated_at" : item[17]
         })
     
     return datas
