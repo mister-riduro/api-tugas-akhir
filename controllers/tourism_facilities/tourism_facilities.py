@@ -83,7 +83,7 @@ def updateTourismFacilities(facil_id):
     if tourismExist is None:
         return responseFailJSON(404, "tourism not found")
     
-    cur.execute("UPDATE tfacilities SET facilities_name = %s, tourism_id = %s, updated_at = %s WHERE tfacilities_id = %s;", (facilitiesName, tourismID, updatedAt))
+    cur.execute("UPDATE tfacilities SET facilities_name = %s, tourism_id = %s, updated_at = %s WHERE tfacilities_id = %s;", (facilitiesName, tourismID, updatedAt, facil_id))
     conn.commit()
 
     cur.execute("SELECT * FROM tfacilities WHERE tfacilities_id = %s;", (facil_id,))
@@ -147,13 +147,14 @@ def insertOneData(item):
 def insertMultipleData(items):
     datas = []
 
-    for item in items:
-        datas.append({
-            'id' : item[0],
-            'tourism_id' : item[1],
-            'name' : item[2],
-            'created_at' : item[3],
-            'updated_at' : item[4]
-        })
+    if len(items) != 0:
+        for item in items:
+            datas.append({
+                'id' : item[0],
+                'tourism_id' : item[1],
+                'name' : item[2],
+                'created_at' : item[3],
+                'updated_at' : item[4]
+            })
     
     return datas
