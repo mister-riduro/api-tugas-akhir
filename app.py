@@ -11,6 +11,7 @@ from controllers.hotels.hotels import hotels
 from controllers.favorite.favorite import favorite
 from controllers.recommendation.recommendation import recommendation
 from controllers.users.users import users
+from controllers.routes.routes import tourismRoutes
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt
 from helpers import *
 from datetime import timedelta
@@ -24,19 +25,21 @@ initializeENV()
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.secret_key = os.getenv('APP_SECRET_KEY')
 
-app.register_blueprint(register)
-app.register_blueprint(login)
-app.register_blueprint(nearestEvent)
-app.register_blueprint(provinces)
-app.register_blueprint(tourismFacilities)
-app.register_blueprint(tourisms)
-app.register_blueprint(tourism_type)
-app.register_blueprint(hotelFacilities)
-app.register_blueprint(hotels)
-app.register_blueprint(favorite)
+# app.register_blueprint(register)
+# app.register_blueprint(login)
+# app.register_blueprint(nearestEvent)
+# app.register_blueprint(provinces)
+# app.register_blueprint(tourismFacilities)
+# app.register_blueprint(tourisms)
+# app.register_blueprint(tourism_type)
+# app.register_blueprint(hotelFacilities)
+# app.register_blueprint(hotels)
+# app.register_blueprint(favorite)
+# app.register_blueprint(users)
+# app.register_blueprint(tourismRoutes)
+# jwt = JWTManager(app)
 app.register_blueprint(recommendation)
-app.register_blueprint(users)
-jwt = JWTManager(app)
+
 
 jwt_redis_blocklist = redis.Redis(
     host=os.getenv('REDIS_HOST'), port=os.getenv('REDIS_PORT'), password=os.getenv('REDIS_PASS')
@@ -44,12 +47,12 @@ jwt_redis_blocklist = redis.Redis(
 
 ACCESS_EXPIRES = timedelta(hours=1)
 
-@jwt.token_in_blocklist_loader
-def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
-    jti = jwt_payload["jti"]
-    token_in_redis = jwt_redis_blocklist.get(jti)
+# @jwt.token_in_blocklist_loader
+# def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
+#     jti = jwt_payload["jti"]
+#     token_in_redis = jwt_redis_blocklist.get(jti)
 
-    return token_in_redis is not None
+#     return token_in_redis is not None
 
 @app.route("/v1/logout", methods = ['DELETE'])
 @jwt_required()
