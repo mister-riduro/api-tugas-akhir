@@ -21,29 +21,28 @@ print(kmeans)
 scaler = joblib.load('D:/College/final-project/api_ta/controllers/recommendation/scaler.joblib')
 
 @recommendation.route("/v1/recommend", methods = ['POST'])
-@jwt_required()
 def recommendHotels():
     facilities = request.json['facilities']
     hotelRating = request.json['hotel_rating']
-    hotelCity = request.json['hotel_city']
+    # hotelCity = request.json['hotel_city']
 
     score = calculateRate(facilities)
     res = recommend(score, hotelRating)
 
-    conn = initializeDB()
-    cur = conn.cursor()
+    # conn = initializeDB()
+    # cur = conn.cursor()
 
-    args = '%' + hotelCity + '%'
+    # args = '%' + hotelCity + '%'
 
-    cur.execute("SELECT * FROM hotels WHERE hotel_city LIKE %s AND cluster = %s;", (args, int(res[0])))
-    hotel = cur.fetchall()
+    # cur.execute("SELECT * FROM hotels WHERE hotel_city LIKE %s AND cluster = %s;", (args, int(res[0])))
+    # hotel = cur.fetchall()
 
-    result = []
+    result = int(res)
 
-    if len(hotel) != 0:
-        result = insertMultipleData(hotel, cur)
+    # if len(hotel) != 0:
+    #     result = insertMultipleData(hotel, cur)
 
-    cur.close()
+    # cur.close()
     return responseSuccessJSON(200, "success get all hotel", result)
 
 def insertMultipleData(items, cur):
